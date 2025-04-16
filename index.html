@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Basic Online Store</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+        }
+
+        .product {
+            border: 1px solid #ccc;
+            padding: 10px;
+            margin-bottom: 10px;
+        }
+
+        .cart {
+            border: 1px solid #ccc;
+            padding: 10px;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>Products</h1>
+    <div id="products"></div>
+
+    <h2>Shopping Cart</h2>
+    <div class="cart" id="cart">
+        <ul id="cart-items"></ul>
+        <p>Total: $<span id="total-price">0.00</span></p>
+        <button onclick="checkout()">Checkout</button>
+    </div>
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script>
+        $(document).ready(function () {
+            loadProducts();
+            updateCart();
+        });
+
+        function loadProducts() {
+            $.ajax({
+                url: 'https://online-store-black-theta.vercel.app/',
+                type: 'GET',
+                success: function (data) {
+                    $('#products').html(data);
+                },
+                error: function (xhr, status, error) {
+                    console.error('Error loading products:', error);
+                }
+            });
+        }
+
+        function addToCart(productId, productName, productPrice) {
+            var cartItems = JSON.parse(localStorage.getItem('cart')) || [];
+            cartItems.push({ id: productId, name: productName, price: productPrice });
+            localStorage.setItem('cart', JSON.stringify(cartItems));
+            updateCart();
+        }
+
+        function updateCart() {
+            var cartItems = JSON.parse(localStorage.getItem('cart')) || [];
+            var totalPrice = 0;
+            var cartHtml = '';
+            cartItems.forEach(item => {
+                totalPrice += parseFloat(item.price);
+                cartHtml += `<li>${item.name} - $${item.price.toFixed(2)}</li>`;
+            });
+            $('#cart-items').html(cartHtml);
+            $('#total-price').text(totalPrice.toFixed(2));
+
+            // Save cart items to cookie
+            document.cookie = 'cart=' + encodeURIComponent(JSON.stringify(cartItems)) + '; path=/';
+        }
+
+        function checkout() {
+            window.location.href = '/checkout.html';
+        }
+    </script>
+</body>
+
+</html>
