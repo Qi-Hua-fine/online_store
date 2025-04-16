@@ -44,7 +44,7 @@
 
         function loadProducts() {
             $.ajax({
-                url: 'https://online-store-eight-beta.vercel.app/',
+                url: '/api/get_products',,
                 type: 'GET',
                 success: function (data) {
                     $('#products').html(data);
